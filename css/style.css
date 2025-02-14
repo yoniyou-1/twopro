@@ -1,0 +1,7 @@
+#container {
+    width: 800px;
+    height: 600px;
+    border: 5px solid black; /* Aquí defines el marco */
+    margin: 0 auto; /* Centra el contenedor horizontalmente */
+    position: relative; /* Asegura que el contenedor esté en la posición correcta */
+}
