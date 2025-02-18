@@ -12,11 +12,12 @@
         <button type="button" id="submitBtn">Submit</button>
     </form>
     <script src="js/two.min.js"></script> <!-- Asegúrate de que la ruta sea correcta -->
-    <script>
+        <script>
         // JSON con los parámetros de los rectángulos
         var rectParamsArray = [
             {
                 id: 'table1',
+                name: 'Table 1',
                 x: 400,
                 y: 300,
                 width: 100,
@@ -29,6 +30,7 @@
                 children: [
                     {
                         id: 'ch1',
+                        name: 'Ch1',
                         x: 50,
                         y: 25,
                         width: 20,
@@ -41,6 +43,7 @@
                     },
                     {
                         id: 'ch2',
+                        name: 'Ch2',
                         x: 75,
                         y: 25,
                         width: 20,
@@ -56,6 +59,7 @@
             // Puedes agregar más rectángulos aquí
             {
                 id: 'table2',
+                name: 'Table 2',
                 x: 600,
                 y: 400,
                 width: 40,

@@ -7,6 +7,7 @@ console.log('Contenedor seleccionado:', elem);
 // Verifica si rectParamsArray existe y tiene los parámetros necesarios, de lo contrario usa valores predeterminados
 var rectParamsArray = typeof rectParamsArray !== 'undefined' && rectParamsArray.length > 0 ? rectParamsArray : [{
     id: 'defaultRect',
+    name: 'Default Rect',
     x: 400,
     y: 300,
     width: 100,
@@ -35,10 +36,10 @@ function createRectangle(params) {
     rect.rotation = params.rotation;
     rect.scale = params.scale;
 
-    // Crear texto en el centro del rectángulo
-    var text = two.makeText(params.id, params.x, params.y);
+    // Crear texto en el centro del rectángulo usando el parámetro name
+    var text = two.makeText(params.name, params.x, params.y);
     text.fill = '#000000'; // Color del texto
-    text.size = 14; // Tamaño del texto
+    text.size = 10; // Tamaño del texto
 
     // Asegúrate de que params.children es un array
     var children = (params.children || []).map(createRectangle);
@@ -134,6 +135,7 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         var rect = item.rect;
         return {
             id: item.text.value,
+            name: item.text.value,
             x: rect.translation.x,
             y: rect.translation.y,
             width: rect.width,
@@ -146,6 +148,7 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
             children: item.children.map(function(child) {
                 return {
                     id: child.text.value,
+                    name: child.text.value,
                     x: child.rect.translation.x,
                     y: child.rect.translation.y,
                     width: child.rect.width,
