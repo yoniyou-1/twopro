@@ -28,7 +28,7 @@ console.log('Instancia de Two.js creada:', two);
 var rectangles = [];
 
 // Función para crear un rectángulo y sus hijos
-function createRectangle(params) {
+function createRectangle(params, isChild = false) {
     var rect = two.makeRectangle(params.x, params.y, params.width, params.height);
     rect.fill = params.fill;
     rect.stroke = params.stroke;
@@ -39,10 +39,10 @@ function createRectangle(params) {
     // Crear texto en el centro del rectángulo usando el parámetro name
     var text = two.makeText(params.name, params.x, params.y);
     text.fill = '#000000'; // Color del texto
-    text.size = 10; // Tamaño del texto
+    text.size = isChild ? 8 : 14; // Tamaño del texto (más grande para padres)
 
     // Asegúrate de que params.children es un array
-    var children = (params.children || []).map(createRectangle);
+    var children = (params.children || []).map(child => createRectangle(child, true));
 
     rectangles.push({ rect: rect, text: text, children: children });
     console.log('Rectángulo creado:', rect);
@@ -51,7 +51,7 @@ function createRectangle(params) {
 }
 
 // Crea los rectángulos usando los parámetros del array
-rectParamsArray.forEach(createRectangle);
+rectParamsArray.forEach(params => createRectangle(params));
 
 // Variables para el arrastre, rotación y escalado
 var dragging = false;
