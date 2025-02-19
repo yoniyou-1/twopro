@@ -44,7 +44,7 @@ function createRectangle(params, isChild = false) {
     // Asegúrate de que params.children es un array
     var children = (params.children || []).map(child => createRectangle(child, true));
 
-    rectangles.push({ rect: rect, text: text, children: children });
+    rectangles.push({ rect: rect, text: text, children: children, isChild: isChild });
     console.log('Rectángulo creado:', rect);
 
     return { rect: rect, text: text, children: children };
@@ -63,6 +63,25 @@ var initialScale = 1;
 var initialDistance = 0;
 var currentRect = null;
 
+// Variables para los modos de interacción
+var mode = 'drag'; // Valores posibles: 'drag', 'rotate', 'scale'
+
+// Manejar los botones de modo
+document.getElementById('dragBtn').addEventListener('click', function() {
+    mode = 'drag';
+    console.log('Modo: arrastre');
+});
+
+document.getElementById('rotateBtn').addEventListener('click', function() {
+    mode = 'rotate';
+    console.log('Modo: rotación');
+});
+
+document.getElementById('scaleBtn').addEventListener('click', function() {
+    mode = 'scale';
+    console.log('Modo: escalado');
+});
+
 // Asegúrate de que los elementos de los rectángulos están disponibles
 two.update();
 rectangles.forEach(function(item) {
@@ -72,10 +91,10 @@ rectangles.forEach(function(item) {
         rect._renderer.elem.addEventListener('mousedown', function(event) {
             console.log('mousedown event');
             currentRect = item;
-            if (event.shiftKey) {
+            if (mode === 'rotate') {
                 rotating = true;
                 initialAngle = Math.atan2(event.clientY - rect.translation.y, event.clientX - rect.translation.x) - rect.rotation;
-            } else if (event.ctrlKey) {
+            } else if (mode === 'scale') {
                 scaling = true;
                 initialDistance = Math.hypot(event.clientX - rect.translation.x, event.clientY - rect.translation.y);
                 initialScale = rect.scale;
@@ -131,7 +150,10 @@ elem.addEventListener('mouseleave', function() {
 
 // Función para manejar el clic en el botón de envío
 document.getElementById('submitBtn').addEventListener('click', function(event) {
-    var rectDataArray = rectangles.map(function(item) {
+    var rectDataArray = rectangles.filter(function(item) {
+        // Filtra solo los rectángulos que no son hijos
+        return !item.isChild;
+    }).map(function(item) {
         var rect = item.rect;
         return {
             id: item.text.value,
@@ -163,17 +185,8 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         };
     });
 
-    // Filtrar los rectángulos principales (sin padres)
-    var filteredRectDataArray = rectDataArray.filter(function(item) {
-        return !rectParamsArray.some(function(param) {
-            return param.children.some(function(child) {
-                return child.id === item.id;
-            });
-        });
-    });
-
     // Mostrar los datos de los rectángulos en la consola
-    console.log('Datos de los rectángulos:', filteredRectDataArray);
+    console.log('Datos de los rectángulos:', rectDataArray);
 
     // Prevenir el comportamiento predeterminado del formulario
     event.preventDefault();
