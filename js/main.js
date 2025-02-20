@@ -17,6 +17,7 @@ var rectParamsArray = typeof rectParamsArray !== 'undefined' && rectParamsArray.
     linewidth: 5,
     rotation: 0,
     scale: 1,
+    availability: 'available', // Renombrado de 'status' a 'availability'
     children: []
 }];
 
@@ -30,7 +31,7 @@ var rectangles = [];
 // Función para crear un rectángulo y sus hijos
 function createRectangle(params, isChild = false) {
     var rect = two.makeRectangle(params.x, params.y, params.width, params.height);
-    rect.fill = params.fill;
+    rect.fill = getColorByAvailability(params.availability); // Usar el color según la disponibilidad
     rect.stroke = params.stroke;
     rect.linewidth = params.linewidth;
     rect.rotation = params.rotation;
@@ -44,10 +45,22 @@ function createRectangle(params, isChild = false) {
     // Asegúrate de que params.children es un array
     var children = (params.children || []).map(child => createRectangle(child, true));
 
-    rectangles.push({ rect: rect, text: text, children: children, isChild: isChild });
+    rectangles.push({ rect: rect, text: text, children: children, isChild: isChild, availability: params.availability });
     console.log('Rectángulo creado:', rect);
 
-    return { rect: rect, text: text, children: children };
+    return { rect: rect, text: text, children: children, availability: params.availability };
+}
+
+// Función para obtener el color según la disponibilidad
+function getColorByAvailability(availability) {
+    switch (availability) {
+        case 'selected':
+            return 'green';
+        case 'occupied':
+            return 'red';
+        default:
+            return 'gray';
+    }
 }
 
 // Crea los rectángulos usando los parámetros del array
@@ -64,7 +77,7 @@ var initialDistance = 0;
 var currentRect = null;
 
 // Variables para los modos de interacción
-var mode = 'drag'; // Valores posibles: 'drag', 'rotate', 'scale'
+var mode = 'drag'; // Valores posibles: 'drag', 'rotate', 'scale', 'status'
 
 // Manejar los botones de modo
 document.getElementById('dragBtn').addEventListener('click', function() {
@@ -82,21 +95,38 @@ document.getElementById('scaleBtn').addEventListener('click', function() {
     console.log('Modo: escalado');
 });
 
+// Nuevo botón para habilitar el modo "status" (ahora para availability)
+document.getElementById('statusBtn').addEventListener('click', function() {
+    mode = 'status';
+    console.log('Modo: cambiar availability individual');
+});
+
 // Asegúrate de que los elementos de los rectángulos están disponibles
 two.update();
 rectangles.forEach(function(item) {
     var rect = item.rect;
     if (rect._renderer.elem) {
-        // Función para iniciar el arrastre, rotación o escalado
+        // Función para iniciar el arrastre, rotación, escalado o cambiar availability
         rect._renderer.elem.addEventListener('mousedown', function(event) {
             console.log('mousedown event');
             currentRect = item;
-            if (mode === 'rotate') {
+            if (mode === 'status') {
+                // Cambiamos la disponibilidad y color del rectángulo sobre el que se hizo clic
+                currentRect.availability = getNextAvailability(currentRect.availability);
+                currentRect.rect.fill = getColorByAvailability(currentRect.availability);
+                two.update();
+            } else if (mode === 'rotate') {
                 rotating = true;
-                initialAngle = Math.atan2(event.clientY - rect.translation.y, event.clientX - rect.translation.x) - rect.rotation;
+                initialAngle = Math.atan2(
+                    event.clientY - rect.translation.y,
+                    event.clientX - rect.translation.x
+                ) - rect.rotation;
             } else if (mode === 'scale') {
                 scaling = true;
-                initialDistance = Math.hypot(event.clientX - rect.translation.x, event.clientY - rect.translation.y);
+                initialDistance = Math.hypot(
+                    event.clientX - rect.translation.x,
+                    event.clientY - rect.translation.y
+                );
                 initialScale = rect.scale;
             } else {
                 dragging = true;
@@ -117,13 +147,19 @@ elem.addEventListener('mousemove', function(event) {
         two.update();
     } else if (rotating && currentRect) {
         console.log('mousemove event (rotating)');
-        var angle = Math.atan2(event.clientY - currentRect.rect.translation.y, event.clientX - currentRect.rect.translation.x);
+        var angle = Math.atan2(
+            event.clientY - currentRect.rect.translation.y,
+            event.clientX - currentRect.rect.translation.x
+        );
         currentRect.rect.rotation = angle - initialAngle;
         currentRect.text.rotation = angle - initialAngle;
         two.update();
     } else if (scaling && currentRect) {
         console.log('mousemove event (scaling)');
-        var currentDistance = Math.hypot(event.clientX - currentRect.rect.translation.x, event.clientY - currentRect.rect.translation.y);
+        var currentDistance = Math.hypot(
+            event.clientX - currentRect.rect.translation.x,
+            event.clientY - currentRect.rect.translation.y
+        );
         currentRect.rect.scale = initialScale * (currentDistance / initialDistance);
         currentRect.text.scale = initialScale * (currentDistance / initialDistance);
         two.update();
@@ -150,40 +186,44 @@ elem.addEventListener('mouseleave', function() {
 
 // Función para manejar el clic en el botón de envío
 document.getElementById('submitBtn').addEventListener('click', function(event) {
-    var rectDataArray = rectangles.filter(function(item) {
-        // Filtra solo los rectángulos que no son hijos
-        return !item.isChild;
-    }).map(function(item) {
-        var rect = item.rect;
-        return {
-            id: item.text.value,
-            name: item.text.value,
-            x: rect.translation.x,
-            y: rect.translation.y,
-            width: rect.width,
-            height: rect.height,
-            fill: rect.fill,
-            stroke: rect.stroke,
-            linewidth: rect.linewidth,
-            rotation: rect.rotation,
-            scale: rect.scale,
-            children: item.children.map(function(child) {
-                return {
-                    id: child.text.value,
-                    name: child.text.value,
-                    x: child.rect.translation.x,
-                    y: child.rect.translation.y,
-                    width: child.rect.width,
-                    height: child.rect.height,
-                    fill: child.rect.fill,
-                    stroke: child.rect.stroke,
-                    linewidth: child.rect.linewidth,
-                    rotation: child.rect.rotation,
-                    scale: child.rect.scale
-                };
-            })
-        };
-    });
+    var rectDataArray = rectangles
+        .filter(function(item) {
+            // Filtra solo los rectángulos que no son hijos
+            return !item.isChild;
+        })
+        .map(function(item) {
+            var rect = item.rect;
+            return {
+                id: item.text.value,
+                name: item.text.value,
+                x: rect.translation.x,
+                y: rect.translation.y,
+                width: rect.width,
+                height: rect.height,
+                fill: rect.fill,
+                stroke: rect.stroke,
+                linewidth: rect.linewidth,
+                rotation: rect.rotation,
+                scale: rect.scale,
+                availability: item.availability, // Renombrado de 'status' a 'availability'
+                children: item.children.map(function(child) {
+                    return {
+                        id: child.text.value,
+                        name: child.text.value,
+                        x: child.rect.translation.x,
+                        y: child.rect.translation.y,
+                        width: child.rect.width,
+                        height: child.rect.height,
+                        fill: child.rect.fill,
+                        stroke: child.rect.stroke,
+                        linewidth: child.rect.linewidth,
+                        rotation: child.rect.rotation,
+                        scale: child.rect.scale,
+                        availability: child.availability // Renombrado de 'status' a 'availability'
+                    };
+                })
+            };
+        });
 
     // Mostrar los datos de los rectángulos en la consola
     console.log('Datos de los rectángulos:', rectDataArray);
@@ -191,5 +231,17 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
     // Prevenir el comportamiento predeterminado del formulario
     event.preventDefault();
 });
+
+// Función para obtener la siguiente disponibilidad (iteración)
+function getNextAvailability(currentAvailability) {
+    switch (currentAvailability) {
+        case 'available':
+            return 'selected';
+        case 'selected':
+            return 'occupied';
+        default:
+            return 'available';
+    }
+}
 
 console.log('Rectángulos renderizados');

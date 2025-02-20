@@ -12,7 +12,9 @@
         <button type="button" id="dragBtn">Drag</button>
         <button type="button" id="rotateBtn">Rotate</button>
         <button type="button" id="scaleBtn">Scale</button>
+        <button type="button" id="statusBtn">Change Status</button> <!-- Nuevo botón -->
         <button type="button" id="submitBtn">Submit</button>
+
     </form>
     <script src="js/two.min.js"></script> <!-- Asegúrate de que la ruta sea correcta -->
     <script>
@@ -30,6 +32,7 @@
                 linewidth: 5,
                 rotation: 0,
                 scale: 1,
+                availability: 'available', // Nuevo parámetro
                 children: [
                     {
                         id: 'ch1',
@@ -42,7 +45,8 @@
                         stroke: 'green',
                         linewidth: 2,
                         rotation: 0,
-                        scale: 1
+                        scale: 1,
+                        availability: 'available' // Nuevo parámetro
                     },
                     {
                         id: 'ch2',
@@ -55,7 +59,8 @@
                         stroke: 'green',
                         linewidth: 2,
                         rotation: 0,
-                        scale: 1
+                        scale: 1,
+                        availability: 'available' // Nuevo parámetro
                     }
                 ]
             },
@@ -72,6 +77,7 @@
                 linewidth: 5,
                 rotation: 0,
                 scale: 1,
+                availability: 'available', // Nuevo parámetro
                 children: []
             },
         ];
