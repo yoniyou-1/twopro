@@ -166,6 +166,43 @@ elem.addEventListener('mousemove', function(event) {
     }
 });
 
+
+// --- Establecer imagen de fondo ---
+// Se obtiene la ruta del input con id "canvasImageInput" en el HTML
+var canvasImageInput = document.getElementById('canvasImageInput');
+var bgImagePath = canvasImageInput ? canvasImageInput.value.trim() : 'img/canvas.jpg';
+if (bgImagePath) {
+    var img = new Image();
+    img.src = bgImagePath;
+    img.onload = function() {
+        var background = two.makeRectangle(two.width / 2, two.height / 2, two.width, two.height);
+        background.noStroke();
+        background.fill = new Two.Texture(img);
+        // Inserta el fondo al inicio de la escena para que se dibuje detrás
+        two.scene.children.unshift(background);
+        
+        // Reordena los elementos interactivos: se sacan y se vuelven a agregar al final
+        rectangles.forEach(function(item) {
+            var idx = two.scene.children.indexOf(item.rect);
+            if (idx !== -1) {
+                two.scene.children.splice(idx, 1);
+                two.scene.children.push(item.rect);
+            }
+            idx = two.scene.children.indexOf(item.text);
+            if (idx !== -1) {
+                two.scene.children.splice(idx, 1);
+                two.scene.children.push(item.text);
+            }
+        });
+        two.update();
+        console.log('Fondo creado:', background);
+    };
+    img.onerror = function() {
+        console.error('Error al cargar la imagen de fondo:', bgImagePath);
+    };
+}
+
+
 // Función para finalizar el arrastre, rotación o escalado
 elem.addEventListener('mouseup', function() {
     console.log('mouseup event');
