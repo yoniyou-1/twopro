@@ -70,14 +70,18 @@ rectParamsArray.forEach(params => createRectangle(params));
 var dragging = false;
 var rotating = false;
 var scaling = false;
+var scalingX = false;
+var scalingY = false;
 var offsetX = 0, offsetY = 0;
 var initialAngle = 0;
 var initialScale = 1;
 var initialDistance = 0;
+var initialWidth = 0;
+var initialHeight = 0;
 var currentRect = null;
 
 // Variables para los modos de interacción
-var mode = 'drag'; // Valores posibles: 'drag', 'rotate', 'scale', 'status'
+var mode = 'drag'; // Valores posibles: 'drag', 'rotate', 'scale', 'scaleX', 'scaleY', 'status'
 
 // Manejar los botones de modo
 document.getElementById('dragBtn').addEventListener('click', function() {
@@ -93,6 +97,16 @@ document.getElementById('rotateBtn').addEventListener('click', function() {
 document.getElementById('scaleBtn').addEventListener('click', function() {
     mode = 'scale';
     console.log('Modo: escalado');
+});
+
+document.getElementById('scaleXBtn').addEventListener('click', function() {
+    mode = 'scaleX';
+    console.log('Modo: escalado en X');
+});
+
+document.getElementById('scaleYBtn').addEventListener('click', function() {
+    mode = 'scaleY';
+    console.log('Modo: escalado en Y');
 });
 
 // Nuevo botón para habilitar el modo "status" (ahora para availability)
@@ -128,6 +142,14 @@ rectangles.forEach(function(item) {
                     event.clientY - rect.translation.y
                 );
                 initialScale = rect.scale;
+            } else if (mode === 'scaleX') {
+                scalingX = true;
+                initialWidth = rect.width;
+                initialDistance = Math.abs(event.clientX - rect.translation.x);
+            } else if (mode === 'scaleY') {
+                scalingY = true;
+                initialHeight = rect.height;
+                initialDistance = Math.abs(event.clientY - rect.translation.y);
             } else {
                 dragging = true;
                 offsetX = event.clientX - rect.translation.x;
@@ -163,9 +185,18 @@ elem.addEventListener('mousemove', function(event) {
         currentRect.rect.scale = initialScale * (currentDistance / initialDistance);
         currentRect.text.scale = initialScale * (currentDistance / initialDistance);
         two.update();
+    } else if (scalingX && currentRect) {
+        console.log('mousemove event (scalingX)');
+        var currentDistanceX = Math.abs(event.clientX - currentRect.rect.translation.x);
+        currentRect.rect.width = initialWidth * (currentDistanceX / initialDistance);
+        two.update();
+    } else if (scalingY && currentRect) {
+        console.log('mousemove event (scalingY)');
+        var currentDistanceY = Math.abs(event.clientY - currentRect.rect.translation.y);
+        currentRect.rect.height = initialHeight * (currentDistanceY / initialDistance);
+        two.update();
     }
 });
-
 
 // --- Establecer imagen de fondo ---
 // Se obtiene la ruta del input con id "canvasImageInput" en el HTML
@@ -202,13 +233,14 @@ if (bgImagePath) {
     };
 }
 
-
 // Función para finalizar el arrastre, rotación o escalado
 elem.addEventListener('mouseup', function() {
     console.log('mouseup event');
     dragging = false;
     rotating = false;
     scaling = false;
+    scalingX = false;
+    scalingY = false;
     currentRect = null;
 });
 
@@ -218,6 +250,8 @@ elem.addEventListener('mouseleave', function() {
     dragging = false;
     rotating = false;
     scaling = false;
+    scalingX = false;
+    scalingY = false;
     currentRect = null;
 });
 
