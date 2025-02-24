@@ -21,8 +21,23 @@ var rectParamsArray = typeof rectParamsArray !== 'undefined' && rectParamsArray.
     children: []
 }];
 
+document.querySelectorAll('.toggle-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      // Remueve la clase activa de todos los botones con clase 'toggle-btn'
+      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+  
+      // Agrega la clase activa al botón que se acaba de clickear
+      this.classList.add('active');
+  
+      // Actualiza el modo usando el id del botón (sin afectar al botón Submit)
+      mode = this.id.replace('Btn', '').toLowerCase();
+      console.log('Modo:', mode);
+    });
+  });
+document.getElementById('dragBtn').classList.add('active');
+
 // Crea una nueva instancia de Two.js
-var two = new Two({ width: 800, height: 600 }).appendTo(elem);
+var two = new Two({ width: 800, height: 300 }).appendTo(elem);
 console.log('Instancia de Two.js creada:', two);
 
 // Array para almacenar los rectángulos creados

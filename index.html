@@ -7,18 +7,21 @@
     <link rel="stylesheet" href="css/style.css"> <!-- Importa el archivo CSS -->
 </head>
 <body>
-    <div id="container"></div>
+    
     <form id="rectForm">
 		<input type="hidden" id="canvasImageInput" value="img/canvas.jpg">
-        <button type="button" id="dragBtn">Drag</button>
-        <button type="button" id="rotateBtn">Rotate</button>
-        <button type="button" id="scaleBtn">Scale</button>
-        <button type="button" id="scaleXBtn">Scale X</button>
-        <button type="button" id="scaleYBtn">Scale Y</button>
-        <button type="button" id="statusBtn">Change Status</button> <!-- Nuevo botón -->
-        <button type="button" id="submitBtn">Submit</button>
+        <div class="button-container">
+            <button type="button" id="dragBtn" class="toggle-btn">Drag</button>
+            <button type="button" id="rotateBtn" class="toggle-btn">Rotate</button>
+            <button type="button" id="scaleBtn" class="toggle-btn">Scale</button>
+            <button type="button" id="scaleXBtn" class="toggle-btn">Scale X</button>
+            <button type="button" id="scaleYBtn" class="toggle-btn">Scale Y</button>
+            <button type="button" id="statusBtn" class="toggle-btn">Change Status</button> <!-- Nuevo botón -->
+            <button type="button" id="submitBtn" class="submit-btn">Submit</button>
+        </div>
 
     </form>
+    <div id="container"></div>
     <script src="js/two.min.js"></script> <!-- Asegúrate de que la ruta sea correcta -->
     <script>
         // JSON con los parámetros de los rectángulos
@@ -72,7 +75,7 @@
                 id: 'table2',
                 name: 'Table 2',
                 x: 600,
-                y: 400,
+                y: 100,
                 width: 40,
                 height: 40,
                 fill: '#FF8000',
