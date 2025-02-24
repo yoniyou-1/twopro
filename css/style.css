@@ -1,4 +1,4 @@
-#container {
+#containercanvas {
     width: 800px;
     height: 300px;
     border: 5px solid black; /* Aquí defines el marco */
@@ -6,7 +6,7 @@
     position: relative; /* Asegura que el contenedor esté en la posición correcta */
 }
 
-.button-container {
+.button-containercanvas {
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -42,7 +42,7 @@ button {
 }
 
 @media (max-width: 600px) {
-    .button-container {
+    .button-containercanvas {
       flex-wrap: wrap;
     }
     .toggle-btn, .submit-btn {

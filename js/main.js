@@ -1,7 +1,7 @@
 // main.js
 
 // Selecciona el contenedor donde se dibujará el lienzo
-var elem = document.getElementById('container');
+var elem = document.getElementById('containercanvas');
 console.log('Contenedor seleccionado:', elem);
 
 // Verifica si rectParamsArray existe y tiene los parámetros necesarios, de lo contrario usa valores predeterminados
